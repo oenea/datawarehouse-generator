@@ -6,7 +6,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python3 generator.py
-pytho3 geneartor2.py
+python3 generator2.py
 ```
-```
-```
+generator2.py will create insert_t1.py and insert_t2.py if they are not existing.

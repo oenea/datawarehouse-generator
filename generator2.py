@@ -1,6 +1,7 @@
 import csv
 import uuid
 import random
+import os
 from faker import Faker
 from datetime import datetime, timedelta, date
 from randomtimestamp import randomtimestamp
@@ -210,10 +211,48 @@ def indent_csv(filename):
     with open(filename, mode='a', newline='', encoding='utf-8') as file:
         file.write("# new data \n\n")
 
+
+def write_sql_to_files():
+    base_path = os.getcwd() + '/' + output
+    sql_template = f"""
+USE CompanyDatabase;
+GO
+
+BULK INSERT Employee FROM '{base_path}/Employee_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT Products FROM '{base_path}/Products_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT Complaint FROM '{base_path}/Complaints_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ReturnProcessing FROM '{base_path}/ReturnProcessing_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ReturnsTable FROM '{base_path}/Returns_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT Material FROM '{base_path}/Material_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ProductCatalogue FROM '{base_path}/ProductCatalogue_t1.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+GO
+"""
+    with open("insert_t1.sql", "w") as file:
+        file.write(sql_template)
+    print(f"SQL file has been written to 'insert_t1.sql' in {base_path}")
+
+    sql_template2 = f"""
+USE CompanyDatabase;
+GO
+
+BULK INSERT Employee FROM '{base_path}/Employee_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT Products FROM '{base_path}/Products_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT Complaint FROM '{base_path}/Complaints_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ReturnProcessing FROM '{base_path}/ReturnProcessing_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ReturnsTable FROM '{base_path}/Returns_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+GO
+"""
+
+    with open("insert_t2.sql", "w") as file:
+        file.write(sql_template2)
+
+    print(f"SQL file has been written to 'insert_t2.sql' in {base_path}")
+
 def main():
     generate_first_period()
     generate_second_period()
     print("database data generated.")
+    write_sql_to_files()
 
 if __name__ == "__main__":
     main()
