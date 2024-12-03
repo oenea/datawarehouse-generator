@@ -14,42 +14,70 @@ fake.add_provider(faker_commerce.Provider)
 
 # number of records
 num_material = 100
-num_productCatalogue = 100
-num_employees = 500
+num_productCatalogue = 1000
+num_employees = 50
 num_products = 1000
-num_returns = 100000
-num_complaints = 10000
+num_returns = 1000
+num_complaints = 100
 
-num_products_b = 1000
+num_products_b = 100
 num_returns_b = 100
-num_complaints_b = 1000
+num_complaints_b = 100
 employees = []
 products = []
+
+
+material_types = {
+    'plastic': ['PVC', 'PE', 'PC'],
+    'wood' : ['Oak', 'Pine', 'Teak'],
+    'metal' : ['Aluminium', 'Steel', 'Copper']
+}
 
 def random_date(start_year, end_year):
     return fake.date_between(start_date=date(start_year, 1, 1), end_date=date(end_year, 12, 31))
 
 def generate_first_period():
-    # generate Employee
-    
+    material = []
+    for _ in range(num_material):
+        material_ = random.choice(list(material_types.keys()))
+        material.append({
+            'id' : str(uuid.uuid4()),
+            'material_type' : material_,
+            'material' :  random.choice(list(material_types[material_]))
+        })
+
     for _ in range(num_employees):
         employees.append({
             'id': str(uuid.uuid4()),
-            'name': fake.name(),
+            'name_': fake.name(),
             'birth_year': random_date(1960, 2005).strftime('%Y-%m-%d %H:%M:%S'),
+            'career_stage' : fake.random_element(['Intern', 'Junior', 'Mid', 'Senior', 'Principal']),
             'employment_start': random_date(2000, 2024).strftime('%Y-%m-%d %H:%M:%S')
         })
 
-    # generate Products
-    for _ in range(num_products):
-        products.append({
-            'id': str(uuid.uuid4()),
-            'name': fake.ecommerce_name().capitalize(),
-            'issue_year': random.randint(2000, 2022),
-            'main_building_material': fake.random_element(['Metal', 'Plastic PBT', 'Plastic POM', 'Plastic ABS', 'Wood', 'Glass Fiber', 'Steel', 'Aluminum', 'Glass', 'Fiber'])
+ 
+    
+    productCatalogue = []
+    for _ in range(num_productCatalogue):
+        ret_material = random.choice(material)
+        productCatalogue.append({
+            'id' : str(uuid.uuid4()),
+            'name_' : fake.ecommerce_name().capitalize(),
+            'catalogue_price' : random.randint(3, 100),
+            'category' : fake.sentence(),
+            'material_id' : ret_material['id'],
+            'introduction_date' : random_date(2000, 2022)
         })
 
-    # generate Returns
+    products = []
+    for _ in range(num_products):
+        ret_productCatalogue = random.choice(productCatalogue)
+        products.append({
+            'id': str(uuid.uuid4()),
+            'catalogue_id' : ret_productCatalogue['id'],
+            'serial_number' : str(uuid.uuid4())
+        })
+
     returns = []
     for _ in range(num_returns):
         product = random.choice(products)
@@ -60,24 +88,14 @@ def generate_first_period():
         returns.append({
             'id': str(uuid.uuid4()),
             'product_id': product['id'],
-            'status': status,
+            'status_': status,
             'employee_id': employee['id'],
             'company_cost': round(random.uniform(50, 500), 2),
-            'description': fake.sentence(),
+            'description_': fake.sentence(),
             'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
             'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
         })
 
-    # generate ReturnProcessing
-    return_processing = []
-    for _ in range(num_returns):
-        ret = random.choice(returns)
-        return_processing.append({
-            'employee_id': ret['employee_id'],
-            'return_id': ret['id']
-        })
-
-    # generate Complaints
     complaints = []
     for _ in range(num_complaints):
         ret = random.choice(returns)
@@ -91,115 +109,138 @@ def generate_first_period():
             'complaint': fake.sentence()
         })
 
-    material = []
-    for _ in range(num_material):
-        material.append({
-            'id' : str(uuid.uuid4()),
-            'material_type' : fake.sentence(),
-            'material' :  fake.sentence()
-        })
-
-    productCatalogue = []
-    for _ in range(num_productCatalogue):
-        ret_material = random.choice(material)
-        productCatalogue.append({
-            'id' : str(uuid.uuid4()),
-            'name' : fake.sentence(),
-            'catalogue_price' : random.randint(3, 100),
-            'category' : fake.sentence(),
-            'material_id' : ret_material['id'],
-            'introduction_date' : random_date(2000, 2022)
-        })
-    
-    period = 't1'
-    save_to_csv(employees, f'{output}/Employee_{period}.csv', ['id', 'name', 'birth_year', 'employment_start'])
-    save_to_csv(products, f'{output}/Products_{period}.csv', ['id', 'name', 'issue_year', 'main_building_material'])
-    save_to_csv(returns, f'{output}/Returns_{period}.csv', ['id', 'product_id', 'status', 'employee_id', 'company_cost', 'description', 'processing_started', 'processing_finished'])
-    save_to_csv(return_processing, f'{output}/ReturnProcessing_{period}.csv', ['employee_id', 'return_id'])
-    save_to_csv(complaints, f'{output}/Complaints_{period}.csv', ['id', 'return_id', 'issue_date', 'resolve_date', 'complaint'])
-    save_to_csv(material, f'{output}/Material_{period}.csv', ['id', 'material_type', 'material'])
-    save_to_csv(productCatalogue, f'{output}/ProductCatalogue_{period}.csv', ['id', 'name', 'catalogue_price', 'category', 'material_id', 'introduction_date'])
-
-def generate_second_period():
-    # generate Products
-    products_new = []
-    for _ in range(num_products_b):
-        products_new.append({
-            'id': str(uuid.uuid4()),
-            'name': fake.ecommerce_name().capitalize(),
-            'issue_year': random.randint(2023, 2024),
-            'main_building_material': fake.random_element(['Metal', 'Plastic ABS', 'Wood', 'Glass Fiber', 'Steel'   , 'Fiber'])
-        })
-
-    # generate Returns
-    returns = []
-    for _ in range(num_returns//3):
-        for product in products:
-            if product['main_building_material'] == 'Plastic ABS' and (product['issue_year'] == 2021 or product['issue_year'] == 2022 or product['issue_year'] == 2023 or product['issue_year'] == 2024):
-                employee = random.choice(employees)
-                status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
-                processing_start = random_date(2023, 2024)
-                processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' else None
-                returns.append({
-                    'id': str(uuid.uuid4()),
-                    'product_id': product['id'],
-                    'status': status,
-                    'employee_id': employee['id'],
-                    'company_cost': round(random.uniform(50, 5000), 2),
-                    'description': fake.sentence(),
-                    'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
-                    'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
-                })
-    print(len(returns))
-
-    for _ in range(num_returns_b):
-        product = random.choice(products_new)
-        employee = random.choice(employees)
-        status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
-        processing_start = random_date(2023, 2024)
-        processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' else None
-        returns.append({
-            'id': str(uuid.uuid4()),
-            'product_id': product['id'],
-            'status': status,
-            'employee_id': employee['id'],
-            'company_cost': round(random.uniform(150, 500), 2),
-            'description': fake.sentence(),
-            'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
-            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
-        })
-
-    # generate ReturnProcessing
     return_processing = []
-    for _ in range(num_returns_b):
+    for _ in range(num_returns):
         ret = random.choice(returns)
         return_processing.append({
             'employee_id': ret['employee_id'],
             'return_id': ret['id']
         })
 
-    # generate Complaints
+    period = 't1'    
+    save_to_csv(material, f'{output}/Material_{period}.csv', ['id', 'material_type', 'material'])
+    save_to_csv(employees, f'{output}/Employee_{period}.csv', ['id', 'name_', 'birth_year', 'career_stage', 'employment_start'])
+    save_to_csv(complaints, f'{output}/Complaints_{period}.csv', ['id', 'return_id', 'issue_date', 'resolve_date', 'complaint'])
+    save_to_csv(productCatalogue, f'{output}/ProductCatalogue_{period}.csv', ['id', 'name_', 'catalogue_price', 'category', 'material_id', 'introduction_date'])
+    save_to_csv(products, f'{output}/Products_{period}.csv', ['id', 'catalogue_id', 'serial_number'])
+    save_to_csv(returns, f'{output}/Returns_{period}.csv', ['id', 'product_id', 'status_', 'employee_id', 'company_cost', 'description_', 'processing_started', 'processing_finished'])
+    save_to_csv(return_processing, f'{output}/ReturnProcessing_{period}.csv', ['employee_id', 'return_id'])
+
+
+def generate_second_period():
+    material = []
+    for _ in range(num_material):
+        material_ = random.choice(list(material_types.keys()))
+        material.append({
+            'id' : str(uuid.uuid4()),
+            'material_type' : material_,
+            'material' : random.choice(list(material_types[material_]))
+        })
+
+    for _ in range(num_employees):
+        employees.append({
+            'id' : str(uuid.uuid4()),
+            'name_' : fake.name(),
+            'birth_year' : random_date(1960, 2005).strftime('%Y-%m-%d %H:%M:%S'),
+            'career_stage' : fake.random_element(['Intern', 'Junior', 'Mid', 'Senior', 'Principal']),
+            'employment_start' : random_date(2000, 2024).strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    productCatalogue = []
+    for _ in range(num_productCatalogue):
+        ret_material = random.choice(material)
+        productCatalogue.append({
+            'id' : str(uuid.uuid4()),
+            'name_' : fake.ecommerce_name().capitalize(),
+            'catalogue_price' : random.randint(3, 100),
+            'category' : fake.sentence(),
+            'material_id' : ret_material['id'],
+            'introduction_date' : random_date(2000, 2022)
+        })
+
+    products = []
+    for _ in range(num_products_b):
+        ret_productCatalogue = random.choice(productCatalogue)
+        products.append({
+            'id': str(uuid.uuid4()),
+            'catalogue_id' : ret_productCatalogue['id'],
+            'serial_number' : str(uuid.uuid4())
+        })
+
+    returns = []
+    for _ in range(num_returns_b):
+        product = random.choice(products)
+        employee = random.choice(employees)
+        status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
+        processing_start = random_date(2000, 2024)
+        processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' else None
+        returns.append({
+            'id': str(uuid.uuid4()),
+            'product_id': product['id'],
+            'status_': status,
+            'employee_id': employee['id'],
+            'company_cost': round(random.uniform(50, 500), 2),
+            'description_': fake.sentence(),
+            'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
+            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
+        })
+    
     complaints = []
     for _ in range(num_complaints_b):
         ret = random.choice(returns)
-        issue_date = random_date(2023, 2024)
+        issue_date = random_date(2000, 2022)
         resolve_date = issue_date + timedelta(days=random.randint(1, 10))
         complaints.append({
-            'id': str(uuid.uuid4()),
-            'return_id': ret['id'],
-            'issue_date': issue_date.strftime('%Y-%m-%d %H:%M:%S'),
-            'resolve_date': resolve_date.strftime('%Y-%m-%d %H:%M:%S'),
-            'complaint': fake.sentence()
+            'id' : str(uuid.uuid4()),
+            'return_id' : ret['id'],
+            'issue_date' : issue_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'resolve_date' : resolve_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'complaint' : fake.sentence()
         })
 
-    employee = []
+    for _ in range(num_returns_b // 2):
+        for product_ in products:
+            catalogue_id = product_['catalogue_id']
+            catalogue_ = [item for item in productCatalogue if str(item["id"]) == catalogue_id][0]
+            #print(catalogue)
+            material_id = catalogue_['material_id']
+            #print(material_id)
+            material_ = [item for item in material if str(item["id"]) == material_id][0]
+
+            #print(material_['material_type'])
+            if material_['material_type'] == 'metal' and catalogue_['introduction_date'].year >= 2023:
+                product = product_
+                employee = random.choice(employees)
+                status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
+                processing_start = random_date(2024, 2024)
+                processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' else None
+                returns.append({
+                    'id' : str(uuid.uuid4()),
+                    'product_id' : product['id'],
+                    'status_' : status,
+                    'employee_id' : employee['id'],
+                    'company_cost' : round(random.uniform(50, 500), 2),
+                    'description_' : fake.sentence(),
+                    'processing_started' : processing_start.strftime('%Y-%m-%d %H:%M:%S'),
+                    'processing_finished' : processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
+                })
+
+    return_processing = []
+    for _ in range(num_returns):
+        ret = random.choice(returns)
+        return_processing.append({
+            'employee_id' : ret['employee_id'],
+            'return_id' : ret['id']
+        })
 
     period = 't2'
-    save_to_csv(employees, f'{output}/Employee_{period}.csv', ['id', 'name', 'birth_year', 'employment_start'])
-    save_to_csv(products, f'{output}/Products_{period}.csv', ['id', 'name', 'issue_year', 'main_building_material'])
-    save_to_csv(returns, f'{output}/Returns_{period}.csv', ['id', 'product_id', 'status', 'employee_id', 'company_cost', 'description', 'processing_started', 'processing_finished'])
-    save_to_csv(return_processing, f'{output}/ReturnProcessing_{period}.csv', ['employee_id', 'return_id'])
+    save_to_csv(material, f'{output}/Material_{period}.csv', ['id', 'material_type', 'material'])
+    save_to_csv(employees, f'{output}/Employee_{period}.csv', ['id', 'name_', 'birth_year', 'career_stage', 'employment_start'])
     save_to_csv(complaints, f'{output}/Complaints_{period}.csv', ['id', 'return_id', 'issue_date', 'resolve_date', 'complaint'])
+    save_to_csv(productCatalogue, f'{output}/ProductCatalogue_{period}.csv', ['id', 'name_', 'catalogue_price', 'category', 'material_id', 'introduction_date'])
+    save_to_csv(products, f'{output}/Products_{period}.csv', ['id', 'catalogue_id', 'serial_number'])
+    save_to_csv(returns, f'{output}/Returns_{period}.csv', ['id', 'product_id', 'status_', 'employee_id', 'company_cost', 'description_', 'processing_started', 'processing_finished'])
+    save_to_csv(return_processing, f'{output}/ReturnProcessing_{period}.csv', ['employee_id', 'return_id'])
 
 def save_to_csv(data, filename, fieldnames, mode='w'):
     with open(filename, mode=mode, newline='', encoding='utf-8') as file:
@@ -235,11 +276,12 @@ GO
 USE CompanyDatabase;
 GO
 
-BULK INSERT Employee FROM '{base_path}/Employee_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
 BULK INSERT Products FROM '{base_path}/Products_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
 BULK INSERT Complaint FROM '{base_path}/Complaints_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
 BULK INSERT ReturnProcessing FROM '{base_path}/ReturnProcessing_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
 BULK INSERT ReturnsTable FROM '{base_path}/Returns_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+BULK INSERT ProductCatalogue FROM '{base_path}/ProductCatalogue_t2.csv' WITH (fieldterminator=',',rowterminator='\\n', DATAFILETYPE = 'widechar', CODEPAGE = '65001')
+
 GO
 """
 
