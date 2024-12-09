@@ -126,7 +126,7 @@ def generate_first_period():
         employee = random.choice(employees)
         status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
         processing_start = random_date(2000, 2024)
-        processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' and status == 'Canceled' else None
+        processing_finished = processing_start + timedelta(days=random.randint(1, 30))
         returns.append({
             'id': str(uuid.uuid4()),
             'product_id': product['id'],
@@ -135,7 +135,7 @@ def generate_first_period():
             'company_cost': round(random.uniform(50, 500), 2),
             'description_': fake.sentence(),
             'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
-            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
+            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S')
         })
 
     for _ in range(num_complaints):
@@ -205,7 +205,7 @@ def generate_second_period():
         employee = random.choice(employees)
         status = fake.random_element(['Pending', 'In Progress', 'Completed', 'Canceled'])
         processing_start = random_date(2000, 2024)
-        processing_finished = processing_start + timedelta(days=random.randint(1, 30)) if status == 'Completed' else None
+        processing_finished = processing_start + timedelta(days=random.randint(1, 30))
         returns.append({
             'id': str(uuid.uuid4()),
             'product_id': product['id'],
@@ -214,7 +214,7 @@ def generate_second_period():
             'company_cost': round(random.uniform(50, 500), 2),
             'description_': fake.sentence(),
             'processing_started': processing_start.strftime('%Y-%m-%d %H:%M:%S'),
-            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S') if processing_finished else ''
+            'processing_finished': processing_finished.strftime('%Y-%m-%d %H:%M:%S')
         })
     
     complaints = []
