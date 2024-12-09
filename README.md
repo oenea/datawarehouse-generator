@@ -11,7 +11,8 @@ python3 generator.py
 ## on windows
 ```
 python3 -m venv .venv
-pip install -r requirements.txt
 .venv\Scripts\activate.ps1
+pip install -r requirements.txt
+python3 generator.py
 ```
 generator2.py will create insert_t1.py and insert_t2.py if they are not existing.
