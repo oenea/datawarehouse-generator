@@ -177,18 +177,19 @@ def generate_second_period():
             'employment_start' : random_date(2000, 2024).strftime('%Y-%m-%d %H:%M:%S')
         })
     
-    productCatalogue = []
-    for _ in range(num_productCatalogue):
-        ret_material = random.choice(material)
-        productCatalogue.append({
-            'id' : str(uuid.uuid4()),
-            'name_' : fake.ecommerce_name().capitalize() + 
-                      "_" + str(fake.pyint(0, 1000)), # too little ecomerce_name to be unique
-            'catalogue_price' : random.randint(10, 200),
-            'category' : fake.random_element(category_names),
-            'material_id' : ret_material['id'],
-            'introduction_date' : random_date(2000, 2022)
-        })
+    #productCatalogue = []
+    for i in range(num_productCatalogue):
+        productCatalogue[i]['catalogue_price'] = 10 
+        #ret_material = random.choice(material)
+        #productCatalogue.append({
+        #    'id' : str(uuid.uuid4()),
+        #    'name_' : fake.ecommerce_name().capitalize() + 
+        #              "_" + str(fake.pyint(0, 1000)), # too little ecomerce_name to be unique
+        #    'catalogue_price' : random.randint(10, 200),
+        #    'category' : fake.random_element(category_names),
+        #    'material_id' : ret_material['id'],
+        #    'introduction_date' : random_date(2000, 2022)
+        #})
 
     products = []
     for _ in range(num_products_b):
